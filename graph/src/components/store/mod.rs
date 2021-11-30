@@ -192,6 +192,7 @@ pub enum EntityFilter {
     NotEndsWith(Attribute, Value),
     NotEndsWithNoCase(Attribute, Value),
     ChangeBlockGte(BlockNumber),
+    Child(String, EntityType, Box<EntityFilter>),
 }
 
 // A somewhat concise string representation of a filter
@@ -235,6 +236,7 @@ impl fmt::Display for EntityFilter {
             NotEndsWith(a, v) => write!(f, "{a} !~ *{v}$"),
             NotEndsWithNoCase(a, v) => write!(f, "{a} !~ *{v}$i"),
             ChangeBlockGte(b) => write!(f, "block >= {b}"),
+            Child(a, et, cf) => write!(f, "join {et} by {a} ({})", cf.to_string()),
         }
     }
 }
