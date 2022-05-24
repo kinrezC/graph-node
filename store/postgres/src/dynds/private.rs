@@ -5,6 +5,7 @@
 use diesel::{
     pg::types::sql_types,
     sql_types::{Integer, Jsonb},
+    types::Bytea,
     PgConnection, QueryDsl, RunQueryDsl,
 };
 use graph::{
@@ -24,7 +25,7 @@ pub(crate) struct DataSourcesTable {
     table: DynTable,
     block_range: DynColumn<sql_types::Range<Integer>>,
     manifest_idx: DynColumn<Integer>,
-    params: DynColumn<Jsonb>,
+    param: DynColumn<Bytea>,
     context: DynColumn<Jsonb>,
 }
 
@@ -40,7 +41,7 @@ impl DataSourcesTable {
             namespace,
             block_range: table.column("block_range"),
             manifest_idx: table.column("manifest_idx"),
-            params: table.column("params"),
+            param: table.column("param"),
             context: table.column("context"),
             table,
         }
@@ -56,7 +57,7 @@ impl DataSourcesTable {
                 manifest_idx integer not null,
                 parent integer references {nsp}.{table},
                 id bytea,
-                params jsonb,
+                param bytea,
                 context jsonb
             );
 
@@ -79,7 +80,7 @@ impl DataSourcesTable {
         //     .select((
         //         self.block_range,
         //         self.manifest_idx,
-        //         self.params,
+        //         self.param,
         //         self.context,
         //     ))
         //     .load(conn)?;

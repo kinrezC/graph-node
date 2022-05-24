@@ -4,7 +4,6 @@ mod traits;
 
 pub use cache::{CachedEthereumCall, EntityCache, ModificationsAndCache};
 pub use err::StoreError;
-use ethabi::Address;
 use itertools::Itertools;
 use stable_hash::{FieldAddress, StableHash};
 use stable_hash_legacy::SequenceNumber;
@@ -833,7 +832,7 @@ pub enum UnfailOutcome {
 #[derive(Clone)]
 pub struct StoredDynamicDataSource {
     pub name: String,
-    pub address: Option<Address>,
+    pub param: Option<Box<[u8]>>,
     pub context: Option<serde_json::Value>,
     pub creation_block: Option<BlockNumber>,
 }
