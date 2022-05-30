@@ -484,22 +484,20 @@ impl Graft {
                 "failed to graft onto `{}` since it has not processed any blocks",
                 self.base
             )),
-            (Ok(Some(ptr)), Ok(is_healthy)) => {
-                if ptr.number < self.block {
-                    gbi!(format!(
-                        "failed to graft onto `{}` at block {} since it has only processed block {}",
-                        self.base, self.block, ptr.number
-                    ))
-                // If the base deployment is failed, the graft shouldn't be allowed.
-                } else if !is_healthy {
-                    gbi!(format!(
-                        "failed to graft onto `{}` at block {} since it's not healthy. You can graft it starting at block {} backwards",
-                        self.base, self.block, ptr.number - 1
-                    ))
-                } else {
-                    vec![]
-                }
-            }
+            (Ok(Some(ptr)), Ok(true)) if ptr.number < self.block => gbi!(format!(
+                "failed to graft onto `{}` at block {} since it has only processed block {}",
+                self.base, self.block, ptr.number
+            )),
+            // If the base deployment is failed *and* the `graft.block` is not
+            // less than the `base.block`, the graft shouldn't be permitted.
+            //
+            // The developer should change their `graft.block` in the manifest
+            // to `base.block - 1` or less.
+            (Ok(Some(ptr)), Ok(false)) if !(self.block < ptr.number) => gbi!(format!(
+                "failed to graft onto `{}` at block {} since it's not healthy. You can graft it starting at block {} backwards",
+                self.base, self.block, ptr.number - 1
+            )),
+            (Ok(Some(_)), Ok(_)) => vec![],
         }
     }
 }
