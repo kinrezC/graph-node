@@ -19,10 +19,7 @@ use graph::{
     },
     constraint_violation,
     data::query::QueryTarget,
-    data::subgraph::{
-        schema::{DeploymentCreate, SubgraphHealth},
-        status,
-    },
+    data::subgraph::{schema::DeploymentCreate, status},
     prelude::StoreEvent,
     prelude::{
         anyhow, futures03::future::join_all, lazy_static, o, web3::types::Address, ApiSchema,
@@ -37,6 +34,7 @@ use graph::{
 use crate::fork;
 use crate::{
     connection_pool::ConnectionPool,
+    deployment::SubgraphHealth,
     primary,
     primary::{DeploymentId, Mirror as PrimaryMirror, Site},
     relational::Layout,
@@ -1209,9 +1207,10 @@ impl SubgraphStoreTrait for SubgraphStore {
         store.block_ptr(site.cheap_clone()).await
     }
 
-    async fn health(&self, id: &DeploymentHash) -> Result<SubgraphHealth, StoreError> {
+    async fn is_healthy(&self, id: &DeploymentHash) -> Result<bool, StoreError> {
         let (store, site) = self.store(id)?;
-        store.health(&site.deployment).await.map(Into::into)
+        let health = store.health(&site.deployment).await?;
+        Ok(matches!(health, SubgraphHealth::Healthy))
     }
 
     /// Find the deployment locators for the subgraph with the given hash
