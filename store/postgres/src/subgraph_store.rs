@@ -19,7 +19,10 @@ use graph::{
     },
     constraint_violation,
     data::query::QueryTarget,
-    data::subgraph::{schema::DeploymentCreate, status},
+    data::subgraph::{
+        schema::{DeploymentCreate, SubgraphHealth},
+        status,
+    },
     prelude::StoreEvent,
     prelude::{
         anyhow, futures03::future::join_all, lazy_static, o, web3::types::Address, ApiSchema,
@@ -1204,6 +1207,11 @@ impl SubgraphStoreTrait for SubgraphStore {
     async fn least_block_ptr(&self, id: &DeploymentHash) -> Result<Option<BlockPtr>, StoreError> {
         let (store, site) = self.store(id)?;
         store.block_ptr(site.cheap_clone()).await
+    }
+
+    async fn health(&self, id: &DeploymentHash) -> Result<SubgraphHealth, StoreError> {
+        let (store, site) = self.store(id)?;
+        store.health(&site.deployment).await.map(Into::into)
     }
 
     /// Find the deployment locators for the subgraph with the given hash

@@ -29,6 +29,7 @@ use crate::data::store::Entity;
 use crate::data::{
     schema::{Schema, SchemaImportError, SchemaValidationError},
     subgraph::features::validate_subgraph_features,
+    subgraph::schema::SubgraphHealth,
 };
 use crate::prelude::{r, CheapClone, ENV_VARS};
 use crate::{blockchain::DataSource, data::graphql::TryFromValue};
@@ -477,6 +478,12 @@ impl Graft {
                     gbi(format!(
                         "failed to graft onto `{}` at block {} since it has only processed block {}",
                         self.base, self.block, ptr.number
+                    ))
+                // If the base deployment is failed, the graft shouldn't be allowed.
+                } else if !matches!(store.health(&self.base).await, Ok(SubgraphHealth::Healthy)) {
+                    gbi(format!(
+                        "failed to graft onto `{}` at block {} since it's not healthy. You can graft it starting at block {} backwards",
+                        self.base, self.block, ptr.number - 1
                     ))
                 } else {
                     vec![]
