@@ -451,15 +451,23 @@ pub struct Graft {
     pub block: BlockNumber,
 }
 
+macro_rules! gbi {
+    ( $( $x:expr ),* ) => {
+        {
+            vec![
+                $(
+                    SubgraphManifestValidationError::GraftBaseInvalid($x),
+                )*
+            ]
+        }
+    };
+}
+
 impl Graft {
     async fn validate<S: SubgraphStore>(
         &self,
         store: Arc<S>,
     ) -> Vec<SubgraphManifestValidationError> {
-        fn gbi(msg: String) -> Vec<SubgraphManifestValidationError> {
-            vec![SubgraphManifestValidationError::GraftBaseInvalid(msg)]
-        }
-
         // We are being defensive here: we don't know which specific
         // instance of a subgraph we will use as the base for the graft,
         // since the notion of which of these instances is active can change
@@ -467,20 +475,20 @@ impl Graft {
         // subgraph is started. We therefore check that any instance of the
         // base subgraph is suitable.
         match store.least_block_ptr(&self.base).await {
-            Err(e) => gbi(e.to_string()),
-            Ok(None) => gbi(format!(
+            Err(e) => gbi!(e.to_string()),
+            Ok(None) => gbi!(format!(
                 "failed to graft onto `{}` since it has not processed any blocks",
                 self.base
             )),
             Ok(Some(ptr)) => {
                 if ptr.number < self.block {
-                    gbi(format!(
+                    gbi!(format!(
                         "failed to graft onto `{}` at block {} since it has only processed block {}",
                         self.base, self.block, ptr.number
                     ))
                 // If the base deployment is failed, the graft shouldn't be allowed.
                 } else if !store.is_healthy(&self.base).await.unwrap_or(true) {
-                    gbi(format!(
+                    gbi!(format!(
                         "failed to graft onto `{}` at block {} since it's not healthy. You can graft it starting at block {} backwards",
                         self.base, self.block, ptr.number - 1
                     ))
