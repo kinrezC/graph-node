@@ -474,20 +474,24 @@ impl Graft {
         // between this check and when the graft actually happens when the
         // subgraph is started. We therefore check that any instance of the
         // base subgraph is suitable.
-        match store.least_block_ptr(&self.base).await {
-            Err(e) => gbi!(e.to_string()),
-            Ok(None) => gbi!(format!(
+        match (
+            store.least_block_ptr(&self.base).await,
+            store.is_healthy(&self.base).await,
+        ) {
+            (Err(e1), Err(e2)) => gbi!(e1.to_string(), e2.to_string()),
+            (Err(e), _) | (_, Err(e)) => gbi!(e.to_string()),
+            (Ok(None), _) => gbi!(format!(
                 "failed to graft onto `{}` since it has not processed any blocks",
                 self.base
             )),
-            Ok(Some(ptr)) => {
+            (Ok(Some(ptr)), Ok(is_healthy)) => {
                 if ptr.number < self.block {
                     gbi!(format!(
                         "failed to graft onto `{}` at block {} since it has only processed block {}",
                         self.base, self.block, ptr.number
                     ))
                 // If the base deployment is failed, the graft shouldn't be allowed.
-                } else if !store.is_healthy(&self.base).await.unwrap_or(true) {
+                } else if !is_healthy {
                     gbi!(format!(
                         "failed to graft onto `{}` at block {} since it's not healthy. You can graft it starting at block {} backwards",
                         self.base, self.block, ptr.number - 1
