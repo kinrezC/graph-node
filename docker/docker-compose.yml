@@ -17,7 +17,7 @@ services:
       ipfs: 'ipfs:5001'
       ethereum: 'mainnet:http://host.docker.internal:8545'
       GRAPH_LOG: info
-      GRAPH_NODE_CONFIG: ./Config.toml
+      GRAPH_NODE_CONFIG: /home/ubuntu/graph/graph-node/docker/Config.toml
   ipfs:
     image: ipfs/go-ipfs:v0.10.0
     ports:
