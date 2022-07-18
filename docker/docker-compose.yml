@@ -41,6 +41,6 @@ services:
       POSTGRES_USER: rmm 
       POSTGRES_PASSWORD: ${PG_PW} 
       POSTGRES_DB: rmm-graph-node
-      PGDATA: "/home/ubuntu/graph/data/postgres"
+      PGDATA: "/var/lib/postgresql/data"
     volumes:
       - /home/ubuntu/graph/data/postgres:/var/lib/postgresql/data
