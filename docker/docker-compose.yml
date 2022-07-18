@@ -27,7 +27,7 @@ services:
     ports:
       - '5001:5001'
     volumes:
-      - /home/ubuntu/graph/data:/data/ipfs
+      - /home/ubuntu/graph/data/ipfs:/data/ipfs
   postgres:
     image: postgres
     ports:
@@ -43,4 +43,4 @@ services:
       POSTGRES_DB: rmm-graph-node
       PGDATA: "/home/ubuntu/graph/data"
     volumes:
-      - /home/ubuntu/graph/data:/var/lib/postgresql/data
+      - /home/ubuntu/graph/data/postgres:/var/lib/postgresql/data
