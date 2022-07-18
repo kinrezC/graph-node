@@ -20,7 +20,7 @@ services:
       postgres_db: rmm-graph-node 
       postgres_port: 5432
       ipfs: 'ipfs:5001'
-      ethereum: 'mainnet:http://host.docker.internal:8545'
+      ethereum: 'mainnet:${ETH_RPC}'
       GRAPH_LOG: info
   ipfs:
     image: ipfs/go-ipfs:v0.10.0
@@ -43,4 +43,4 @@ services:
       POSTGRES_DB: rmm-graph-node
       PGDATA: "/data/postgres"
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - ./data/postgres:/home/ubuntu/graph/data
