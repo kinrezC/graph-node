@@ -16,7 +16,7 @@ services:
     environment:
       postgres_host: postgres 
       postgres_user: hyper 
-      postgres_pass: ${PG_PW} 
+      postgres_pass: ${PG_PASS} 
       postgres_db: hyper-graph-node 
       postgres_port: 5432
       ipfs: 'ipfs:5001'
