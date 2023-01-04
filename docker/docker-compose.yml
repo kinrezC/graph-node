@@ -39,7 +39,7 @@ services:
       ]
     environment:
       POSTGRES_USER: hyper 
-      POSTGRES_PASSWORD: ${PG_PW} 
+      POSTGRES_PASSWORD: ${PG_PASS} 
       POSTGRES_DB: hyper-graph-node 
       PGDATA: "/var/lib/postgresql/data"
     volumes:
